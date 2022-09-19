@@ -1,7 +1,6 @@
-package com.edu.ulab.app.mapper;
+package com.edu.ulab.app.mapper.request;
 
 import com.edu.ulab.app.dto.UserDto;
-import com.edu.ulab.app.entity.User;
 import com.edu.ulab.app.web.request.UserRequest;
 import org.mapstruct.Mapper;
 //TODO: может ли maper мапить 2 прослойки?

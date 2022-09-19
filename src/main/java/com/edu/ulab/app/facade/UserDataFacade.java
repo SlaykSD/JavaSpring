@@ -2,13 +2,14 @@ package com.edu.ulab.app.facade;
 
 import com.edu.ulab.app.dto.BookDto;
 import com.edu.ulab.app.dto.UserDto;
-import com.edu.ulab.app.entity.Book;
-import com.edu.ulab.app.exception.NotFoundException;
-import com.edu.ulab.app.mapper.BookMapper;
-import com.edu.ulab.app.mapper.UserMapper;
+import com.edu.ulab.app.mapper.request.BookMapper;
+import com.edu.ulab.app.mapper.request.UserMapper;
+import com.edu.ulab.app.mapper.request.update.BookUpdateMapper;
+import com.edu.ulab.app.mapper.request.update.UserUpdateMapper;
 import com.edu.ulab.app.service.BookService;
 import com.edu.ulab.app.service.UserService;
 import com.edu.ulab.app.web.request.UserBookRequest;
+import com.edu.ulab.app.web.request.update.UserBookUpdateRequest;
 import com.edu.ulab.app.web.response.UserBookResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -23,16 +24,23 @@ public class UserDataFacade {
     private final BookService bookService;
     private final UserMapper userMapper;
     private final BookMapper bookMapper;
+    private final BookUpdateMapper bookUpdateMapper;
+    private final UserUpdateMapper userUpdateMapper;
 
     public UserDataFacade(UserService userService,
                           BookService bookService,
                           UserMapper userMapper,
-                          BookMapper bookMapper) {
+                          BookMapper bookMapper,
+                          BookUpdateMapper bookUpdateMapper,
+                          UserUpdateMapper userUpdateMapper) {
         this.userService = userService;
         this.bookService = bookService;
         this.userMapper = userMapper;
         this.bookMapper = bookMapper;
+        this.bookUpdateMapper = bookUpdateMapper;
+        this.userUpdateMapper = userUpdateMapper;
     }
+
     //TODO:написать создание функции
     public UserBookResponse createUserWithBooks(UserBookRequest userBookRequest) {
         log.info("Got user book create request: {}", userBookRequest);
@@ -41,7 +49,7 @@ public class UserDataFacade {
 
         UserDto createdUser = userService.createUser(userDto);
         log.info("Created user: {}", createdUser);
-        //bookService.createBook(BookDto.builder().author("1").pageCount(1).title("1").build());
+
         List<Long> bookIdList = userBookRequest.getBookRequests()
                 .stream()
                 .filter(Objects::nonNull)
@@ -60,32 +68,22 @@ public class UserDataFacade {
                 .build();
     }
 
-    public UserBookResponse updateUserWithBooks(UserBookRequest userBookRequest, Long userId) {
-        //Ситуация 1 неверный id
+    public UserBookResponse updateUserWithBooks(UserBookUpdateRequest userBookRequest) {
         log.info("Got user book update request: {}", userBookRequest);
-        UserDto userDto = userMapper.userRequestToUserDto(userBookRequest.getUserRequest());
-        userDto.setId(userId);
+        UserDto userDto =  userService.updateUser(userUpdateMapper
+                .userUpdateRequestToUserDto(userBookRequest.getUserRequest()));
         log.info("Mapped user request: {}", userDto);
-        UserDto updatedUser = userService.updateUser(userDto);
-        log.info("Update user: {}", updatedUser);
-       // updatedUser.setId(userId);
-
-        List<Long> bookIdList = userBookRequest.getBookRequests()
+        List<Long> listBooksId = userBookRequest.getBookRequests()
                 .stream()
                 .filter(Objects::nonNull)
-                .map(bookMapper::bookRequestToBookDto)
-                .peek(bookDto -> bookDto.setUserId(userId))
-                .peek(mappedBookDto -> log.info("mapped book: {}", mappedBookDto))
+                .map(bookUpdateMapper::bookUpdateRequestToBookDto)
+                .peek(n -> n.setUserId(userDto.getId()))
                 .map(bookService::updateBook)
-                .peek(updatedBook -> log.info("Updated book: {}", updatedBook))
+                .peek(n -> log.info(n.toString()))
                 .map(BookDto::getId)
                 .toList();
-        log.info("Collected book ids: {}", bookIdList);
-
-        return UserBookResponse.builder()
-                .userId(updatedUser.getId())
-                .booksIdList(bookIdList)
-                .build();
+        log.info("Collected updates book ids: {}", listBooksId);
+        return UserBookResponse.builder().userId(userDto.getId()).booksIdList(listBooksId).build();
 
     }
 

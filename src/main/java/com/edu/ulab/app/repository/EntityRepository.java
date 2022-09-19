@@ -30,5 +30,4 @@ public interface EntityRepository <K extends Number,V >  {
      * @return all entities
      */
     Iterable<V> findAll();
-   // public V update(V entity);
 }

@@ -34,9 +34,6 @@ public class BookStorage implements Storage<Long, Book> {
 
     @Override
     public Book update(Book entity) {
-        if(entity.getId() ==  null || findById(entity.getId()).isEmpty()){
-            throw  new NotFoundException("User not found with id: "+ entity.getId());
-        }
         Book bookToUpdate = findById(entity.getId()).get();
 
         if (entity.getAuthor() == null) {

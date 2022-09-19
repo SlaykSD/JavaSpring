@@ -37,7 +37,7 @@ public class BookServiceImpl implements BookService {
     public BookDto getBookById(Long id) {
         if(id!=null) {
             return  bookRepository.findById(id)
-                    .orElseThrow(()->new NotFoundException("Book with id:%d not found"));
+                    .orElseThrow(()->new NotFoundException(String.format("Book with id:%d not found",id)));
         }
         return null;
     }

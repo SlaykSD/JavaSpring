@@ -31,7 +31,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUser(UserDto userDto) {
         if(userDto.getId() != null){
-            //check if dto not exists
             return userRepository.save(getUserById(userDto.getId()));
         }
         return null;
@@ -42,11 +41,8 @@ public class UserServiceImpl implements UserService {
     public UserDto getUserById(Long id) {
 
         if(id!=null) {
-            Optional<UserDto> res = userRepository.findById(id);
-            if(res.isEmpty()){
-                throw new NotFoundException(String.format("User with id:%d not found", res.get().getId()));
-            }
-            return res.get();
+            userRepository.findById(id)
+                    .orElseThrow(()->new NotFoundException(String.format("User with id:%d not found", id)));
         }
         return null;
     }
