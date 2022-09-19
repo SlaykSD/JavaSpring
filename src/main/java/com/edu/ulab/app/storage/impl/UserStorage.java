@@ -33,17 +33,12 @@ public class UserStorage implements Storage<Long, User> {
 
     @Override
     public void delete(Long primaryKey) {
-        //Пофиксить
         Optional<User> optUser = findById(primaryKey);
-        //Остались книги со связями
         optUser.ifPresent(user -> users.remove(user.getId()));
     }
 
     @Override
     public User update(User entity) {
-        if(entity.getId() ==  null || findById(entity.getId()).isEmpty()){
-            throw  new NotFoundException("User not found with id: "+ entity.getId());
-        }
         User userToUpdate = findById(entity.getId()).get();
 
         if (entity.getAge() == 0) {
