@@ -1,5 +1,6 @@
 package com.edu.ulab.app.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
