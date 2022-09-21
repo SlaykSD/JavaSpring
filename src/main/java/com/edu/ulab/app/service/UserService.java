@@ -9,7 +9,7 @@ public interface UserService {
 
     UserDto updateUser(UserDto userDto);
 
-   // List<Long> getUserBookIds(Long id);
+    List<Long> getUserBookIds(Long id);
 
     UserDto getUserById(Long id);
 

@@ -118,12 +118,13 @@ public class UserDataFacade {
         log.info("Got user book get request: {}", userId);
         UserDto userDto = userService.getUserById(userId);
 
-        List<Long> bookIdList = bookService.getBooksByUserId(userId)
-                .stream()
-                .filter(Objects::nonNull)
-                .peek(bookDto -> log.info("Got book: {}",bookDto))
-                .map(BookDto::getId)
-                .toList();
+//        List<Long> bookIdList = bookService.getBooksByUserId(userId)
+//                .stream()
+//                .filter(Objects::nonNull)
+//                .peek(bookDto -> log.info("Got book: {}",bookDto))
+//                .map(BookDto::getId)
+//                .toList();
+        List<Long> bookIdList = userService.getUserBookIds(userId);
         log.info("Collected book ids: {}", bookIdList);
 
         return UserBookResponse.builder()

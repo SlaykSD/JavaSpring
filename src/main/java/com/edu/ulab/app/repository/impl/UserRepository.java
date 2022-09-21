@@ -10,42 +10,39 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public class UserRepository implements EntityRepository<Long, UserDto> {
+public class UserRepository implements EntityRepository<Long, User> {
     private final UserStorage userStorage;
-    private final UserDtoMapper userDtoMapper;
 
-    public UserRepository(UserStorage userStorage, UserDtoMapper userDtoMapper) {
+    public UserRepository(UserStorage userStorage) {
         this.userStorage = userStorage;
-        this.userDtoMapper = userDtoMapper;
     }
 
 
     @Override
-    public UserDto save(UserDto entity) {
-        User user = userDtoMapper.userDtoToUser(entity);
-        if(user.getId()!= null){
-            User found = userStorage.findById(user.getId());
+    public User save(User entity) {
+        if(entity.getId()!= null){
+            User found = userStorage.findById(entity.getId());
             if(found != null){
-                return  userDtoMapper.userToUserDto(userStorage.update(user));
+                return  userStorage.update(entity);
             }
         }
 
-        return userDtoMapper.userToUserDto(userStorage.save(user));
+        return userStorage.save(entity);
     }
 
     @Override
-    public Optional<UserDto> findById(Long primaryKey) {
-        return  Optional.ofNullable(userDtoMapper.userToUserDto(userStorage.findById(primaryKey)));
+    public Optional<User> findById(Long primaryKey) {
+        return  Optional.ofNullable(userStorage.findById(primaryKey));
     }
 
     @Override
-    public void delete(UserDto entity) {
-        userStorage.delete(userDtoMapper.userDtoToUser(entity).getId());
+    public void delete(User entity) {
+        userStorage.delete(entity.getId());
     }
 
     @Override
-    public Iterable<UserDto> findAll() {
-        return userStorage.getAllEntity().stream().map(userDtoMapper::userToUserDto).toList();
+    public Iterable<User> findAll() {
+        return userStorage.getAllEntity();
     }
 
 

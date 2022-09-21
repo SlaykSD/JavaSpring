@@ -1,6 +1,6 @@
 package com.edu.ulab.app.repository.impl;
 
-import com.edu.ulab.app.dto.BookDto;
+
 import com.edu.ulab.app.entity.Book;
 import com.edu.ulab.app.mapper.dto.BookDtoMapper;
 import com.edu.ulab.app.repository.EntityRepository;
@@ -10,42 +10,41 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public class BookRepository implements EntityRepository<Long, BookDto> {
+public class BookRepository implements EntityRepository<Long, Book> {
     private final BookStorage bookStorage;
-    private final BookDtoMapper bookDtoMapper;
+   // private final BookDtoMapper bookDtoMapper;
 
     public BookRepository(BookStorage bookStorage, BookDtoMapper bookDtoMapper) {
         this.bookStorage = bookStorage;
-        this.bookDtoMapper = bookDtoMapper;
+
     }
 
 
     @Override
-    public BookDto save(BookDto entity) {
-        Book book = bookDtoMapper.bookDtoToBook(entity);
-        if(book.getId()!= null){
-            Book found = bookStorage.findById(book.getId());
+    public Book save(Book entity) {
+        if(entity.getId()!= null){
+            Book found = bookStorage.findById(entity.getId());
             if(found != null){
-                return bookDtoMapper.bookToBookDto(bookStorage.update(book));
+                return bookStorage.update(entity);
             }
         }
 
-        return bookDtoMapper.bookToBookDto(bookStorage.save(book));
+        return bookStorage.save(entity);
     }
 
     @Override
-    public Optional<BookDto> findById(Long primaryKey) {
-       return  Optional.ofNullable(bookDtoMapper.bookToBookDto(bookStorage.findById(primaryKey)));
+    public Optional<Book> findById(Long primaryKey) {
+       return  Optional.ofNullable(bookStorage.findById(primaryKey));
     }
 
     @Override
-    public void delete(BookDto entity) {
-        bookStorage.delete(bookDtoMapper.bookDtoToBook(entity).getId());
+    public void delete(Book entity) {
+        bookStorage.delete(entity.getId());
     }
 
     @Override
-    public Iterable<BookDto> findAll() {
-        return bookStorage.getAllEntity().stream().map(bookDtoMapper::bookToBookDto).toList();
+    public Iterable<Book> findAll() {
+        return bookStorage.getAllEntity();
     }
 
 }
