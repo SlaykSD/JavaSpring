@@ -2,6 +2,7 @@ package com.edu.ulab.app.service.impl;
 
 import com.edu.ulab.app.dto.BookDto;
 import com.edu.ulab.app.entity.Book;
+import com.edu.ulab.app.exception.BookNotFoundException;
 import com.edu.ulab.app.exception.NotFoundException;
 import com.edu.ulab.app.mapper.dto.BookDtoMapper;
 import com.edu.ulab.app.service.BookService;
@@ -32,7 +33,22 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookDto updateBook(BookDto bookDto) {
         if(bookDto.getId()!=null){
-            if(getBookById(bookDto.getId())!=null){
+            BookDto bookDtoUpdate = getBookById(bookDto.getId());
+            if(bookDtoUpdate!=null){
+
+                if (bookDto.getAuthor() == null) {
+                    bookDto.setAuthor(bookDtoUpdate.getAuthor());
+                }
+                if (bookDto.getTitle() == null) {
+                    bookDto.setTitle(bookDtoUpdate.getTitle());
+                }
+                if (bookDto.getPageCount() == 0) {
+                    bookDto.setPageCount(bookDtoUpdate.getPageCount());
+                }
+                if (bookDto.getUserId() == null) {
+                    bookDto.setUserId(bookDtoUpdate.getUserId());
+                }
+
                 return bookDtoMapper.bookToBookDto(bookRepository.save(bookDtoMapper.bookDtoToBook(bookDto)));
             }
         }
@@ -43,9 +59,9 @@ public class BookServiceImpl implements BookService {
     public BookDto getBookById(Long id) {
         if(id!=null) {
             return  bookDtoMapper.bookToBookDto(bookRepository.findById(id)
-                    .orElseThrow(()->new NotFoundException(String.format("Book with id:%d not found",id))));
+                    .orElseThrow(()->new BookNotFoundException(id)));
         }
-            throw new NotFoundException(String.format("Book with id:%d not found",id));
+            throw new BookNotFoundException(id);
     }
 
     @Override

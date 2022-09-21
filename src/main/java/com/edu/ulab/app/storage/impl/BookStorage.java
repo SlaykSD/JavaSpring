@@ -42,7 +42,7 @@ public class BookStorage implements Storage<Long, Book> {
         books.remove(book.getId());
         User user = userStorage.findById(book.getUserId());
         if(user != null) {
-            var updatedList = user.getBooksId();
+            List<Long> updatedList = user.getBooksId();
             updatedList.remove(primaryKey);
             user.setBooksId(updatedList);
         }
@@ -50,20 +50,6 @@ public class BookStorage implements Storage<Long, Book> {
 
     @Override
     public Book update(Book entity) {
-        Book bookToUpdate = findById(entity.getId());
-
-        if (entity.getAuthor() == null) {
-            entity.setAuthor(bookToUpdate.getAuthor());
-        }
-        if (entity.getTitle() == null) {
-            entity.setTitle(bookToUpdate.getTitle());
-        }
-        if (entity.getPageCount() == 0) {
-            entity.setPageCount(bookToUpdate.getPageCount());
-        }
-        if (entity.getUserId() == null) {
-            entity.setUserId(bookToUpdate.getUserId());
-        }
         books.remove(entity.getId());
         books.put(entity.getId(), entity);
         return entity;
