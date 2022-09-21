@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 @Data
 public class UserUpdateRequest {
 
-    @Min(value = 0,message = "The ID must be greater than 0")
+    @Min(value = 1,message = "The ID must be greater than 0")
     private Long id;
 
     @Size( max =20,message = "limit 20 characters")
