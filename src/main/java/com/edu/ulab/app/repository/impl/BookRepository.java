@@ -24,8 +24,8 @@ public class BookRepository implements EntityRepository<Long, BookDto> {
     public BookDto save(BookDto entity) {
         Book book = bookDtoMapper.bookDtoToBook(entity);
         if(book.getId()!= null){
-            Optional<Book> found = bookStorage.findById(book.getId());
-            if(found.isPresent()){
+            Book found = bookStorage.findById(book.getId());
+            if(found != null){
                 return bookDtoMapper.bookToBookDto(bookStorage.update(book));
             }
         }
@@ -35,7 +35,7 @@ public class BookRepository implements EntityRepository<Long, BookDto> {
 
     @Override
     public Optional<BookDto> findById(Long primaryKey) {
-       return  Optional.of(bookDtoMapper.bookToBookDto(bookStorage.findById(primaryKey).get()));
+       return  Optional.ofNullable(bookDtoMapper.bookToBookDto(bookStorage.findById(primaryKey)));
     }
 
     @Override

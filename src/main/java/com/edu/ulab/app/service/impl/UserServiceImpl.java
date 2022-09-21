@@ -33,15 +33,14 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
-
     @Override
     public UserDto getUserById(Long id) {
 
         if(id!=null) {
-            userRepository.findById(id)
+            return  userRepository.findById(id)
                     .orElseThrow(()->new NotFoundException(String.format("User with id:%d not found", id)));
         }
-        return null;
+        throw new NotFoundException(String.format("User with id:%d not found", id));
     }
 
     @Override

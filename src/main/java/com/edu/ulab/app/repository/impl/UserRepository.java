@@ -24,8 +24,8 @@ public class UserRepository implements EntityRepository<Long, UserDto> {
     public UserDto save(UserDto entity) {
         User user = userDtoMapper.userDtoToUser(entity);
         if(user.getId()!= null){
-            Optional<User> found = userStorage.findById(user.getId());
-            if(found.isPresent()){
+            User found = userStorage.findById(user.getId());
+            if(found != null){
                 return  userDtoMapper.userToUserDto(userStorage.update(user));
             }
         }
@@ -35,7 +35,7 @@ public class UserRepository implements EntityRepository<Long, UserDto> {
 
     @Override
     public Optional<UserDto> findById(Long primaryKey) {
-        return  Optional.of(userDtoMapper.userToUserDto(userStorage.findById(primaryKey).get()));
+        return  Optional.ofNullable(userDtoMapper.userToUserDto(userStorage.findById(primaryKey)));
     }
 
     @Override

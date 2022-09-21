@@ -18,7 +18,7 @@ public  interface Storage<K,V>{
     // так же учесть, что методы хранилища принимают друго тип данных - учесть это в абстракции
 
     public V save(V entity);
-    public Optional<V> findById(K primaryKey);
+    public V findById(K primaryKey);
     public void delete(K primaryKey);
     public V update(V entity);
     public Iterable<V> getAllEntity();

@@ -13,28 +13,44 @@ import java.util.concurrent.atomic.AtomicLong;
 public class BookStorage implements Storage<Long, Book> {
     private final Map<Long, Book> books= new HashMap<>();
     private static final AtomicLong AUTO_ID = new AtomicLong(1);
+    private final  UserStorage userStorage;
+
+    public BookStorage(UserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
 
     @Override
     public Book save(Book entity) {
         entity.setId(AUTO_ID.getAndIncrement());
         books.put(AUTO_ID.get() - 1 , entity);
+        User user = userStorage.findById(entity.getUserId());
+        if(user!= null) {
+            user.getBooksId().add(entity.getId());
+            userStorage.update(user);
+        }
         return entity;
     }
 
     @Override
-    public Optional<Book> findById(Long primaryKey) {
-        return Optional.ofNullable(books.get(primaryKey));
+    public Book findById(Long primaryKey) {
+        return books.get(primaryKey);
     }
 
     @Override
     public void delete(Long primaryKey) {
-        Optional<Book> optBook = findById(primaryKey);
-        optBook.ifPresent(book -> books.remove(book.getId()));
+        Book book = findById(primaryKey);
+        books.remove(book.getId());
+        User user = userStorage.findById(book.getUserId());
+        if(user != null) {
+            var updatedList = user.getBooksId();
+            updatedList.remove(primaryKey);
+            user.setBooksId(updatedList);
+        }
     }
 
     @Override
     public Book update(Book entity) {
-        Book bookToUpdate = findById(entity.getId()).get();
+        Book bookToUpdate = findById(entity.getId());
 
         if (entity.getAuthor() == null) {
             entity.setAuthor(bookToUpdate.getAuthor());

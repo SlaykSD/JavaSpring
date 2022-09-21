@@ -39,7 +39,7 @@ public class BookServiceImpl implements BookService {
             return  bookRepository.findById(id)
                     .orElseThrow(()->new NotFoundException(String.format("Book with id:%d not found",id)));
         }
-        return null;
+            throw new NotFoundException(String.format("Book with id:%d not found",id));
     }
 
     @Override
