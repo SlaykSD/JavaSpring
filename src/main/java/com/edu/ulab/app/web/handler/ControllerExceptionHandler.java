@@ -28,12 +28,10 @@ public class ControllerExceptionHandler {
     }
 
     @ExceptionHandler({ValidationException.class, HttpMessageNotReadableException.class,NotReadablePropertyException.class})
-    public ResponseEntity<String> handleValidationExceptions(Exception e) {
-        log.error("Throws exception: ", e);
-        return new ResponseEntity<>(
-                ErrorMessage.VALIDATION_ERROR.getMessage(),
-                HttpStatus.valueOf(400)
-        );
+    public ResponseEntity<BaseWebResponse> handleValidationExceptions(Exception e) {
+        log.error(e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new BaseWebResponse(createErrorMessage(e)));
     }
 
     @ExceptionHandler
