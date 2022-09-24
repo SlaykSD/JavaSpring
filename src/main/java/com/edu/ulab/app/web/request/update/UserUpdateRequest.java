@@ -1,4 +1,4 @@
-package com.edu.ulab.app.web.request;
+package com.edu.ulab.app.web.request.update;
 
 import lombok.Data;
 
@@ -6,7 +6,11 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 
 @Data
-public class UserRequest {
+public class UserUpdateRequest {
+
+    @Min(value = 1,message = "The ID must be greater than 0")
+    private Long id;
+
     @Size( max =20,message = "limit 20 characters")
     private String fullName;
 

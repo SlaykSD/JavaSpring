@@ -1,4 +1,4 @@
-package com.edu.ulab.app.mapper;
+package com.edu.ulab.app.mapper.request;
 
 import com.edu.ulab.app.dto.BookDto;
 import com.edu.ulab.app.web.request.BookRequest;

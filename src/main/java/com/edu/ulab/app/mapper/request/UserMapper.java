@@ -1,4 +1,4 @@
-package com.edu.ulab.app.mapper;
+package com.edu.ulab.app.mapper.request;
 
 import com.edu.ulab.app.dto.UserDto;
 import com.edu.ulab.app.web.request.UserRequest;
@@ -9,4 +9,5 @@ public interface UserMapper {
     UserDto userRequestToUserDto(UserRequest userRequest);
 
     UserRequest userDtoToUserRequest(UserDto userDto);
+
 }
