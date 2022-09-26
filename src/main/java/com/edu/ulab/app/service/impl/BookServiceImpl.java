@@ -2,83 +2,88 @@ package com.edu.ulab.app.service.impl;
 
 import com.edu.ulab.app.dto.BookDto;
 import com.edu.ulab.app.entity.Book;
+import com.edu.ulab.app.entity.Person;
 import com.edu.ulab.app.exception.BookNotFoundException;
-import com.edu.ulab.app.exception.NotFoundException;
+import com.edu.ulab.app.exception.UserNotFoundException;
 import com.edu.ulab.app.mapper.dto.BookDtoMapper;
+import com.edu.ulab.app.repository.BookRepository;
 import com.edu.ulab.app.service.BookService;
-import com.edu.ulab.app.repository.impl.BookRepository;
-import com.edu.ulab.app.service.UserService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final BookDtoMapper bookDtoMapper;
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
-    @Override
-    public BookDto createBook(BookDto bookDto) {
-        return bookDtoMapper.bookToBookDto(bookRepository.save(
-                bookDtoMapper.bookDtoToBook(bookDto)));
+    public BookServiceImpl(BookRepository bookRepository, BookDtoMapper bookDtoMapper, UserServiceImpl userService) {
+        this.bookRepository = bookRepository;
+        this.bookDtoMapper = bookDtoMapper;
+        this.userService = userService;
     }
 
     @Override
+    @Transactional
+    public BookDto createBook(BookDto bookDto) {
+        Book book = bookDtoMapper.bookDtoToBook(bookDto);
+        log.info("Mapped book: {}", book);
+        Book savedBook = bookRepository.save(book);
+        log.info("Saved book: {}", savedBook);
+        return bookDtoMapper.bookToBookDto(savedBook);
+    }
+
+    @Override
+    @Transactional
     public BookDto updateBook(BookDto bookDto) {
-        if(bookDto.getId()!=null){
-            BookDto bookDtoUpdate = getBookById(bookDto.getId());
-            if(bookDtoUpdate!=null){
-
-                if (bookDto.getAuthor() == null) {
-                    bookDto.setAuthor(bookDtoUpdate.getAuthor());
-                }
-                if (bookDto.getTitle() == null) {
-                    bookDto.setTitle(bookDtoUpdate.getTitle());
-                }
-                if (bookDto.getPageCount() == 0) {
-                    bookDto.setPageCount(bookDtoUpdate.getPageCount());
-                }
-                if (bookDto.getUserId() == null) {
-                    bookDto.setUserId(bookDtoUpdate.getUserId());
-                }
-
-                return bookDtoMapper.bookToBookDto(bookRepository.save(bookDtoMapper.bookDtoToBook(bookDto)));
-            }
-        }
-        return null;
+        bookRepository.findByIdForUpdate(bookDto.getId())
+                .orElseThrow(() -> new BookNotFoundException(bookDto.getId()));
+        Book book = bookDtoMapper.bookDtoToBook(bookDto);
+        log.info("Mapped book: {}", book);
+        Book savedBook = bookRepository.save(book);
+        log.info("Update book: {}", savedBook);
+        return bookDtoMapper.bookToBookDto(savedBook);
     }
 
     @Override
     public BookDto getBookById(Long id) {
-        if(id!=null) {
-            return  bookDtoMapper.bookToBookDto(bookRepository.findById(id)
-                    .orElseThrow(()->new BookNotFoundException(id)));
-        }
-            throw new BookNotFoundException(id);
+        log.info("Got book by id: {}", id);
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException(id));
+        log.info("A book was found {}", book);
+        return bookDtoMapper.bookToBookDto(book);
+
     }
 
     @Override
+    @Transactional
     public void deleteBookById(Long id) {
-        bookRepository.delete(bookDtoMapper.bookDtoToBook(getBookById(id)));
+        log.info("Got book id for delete: {}", id);
+        BookDto book = getBookById(id);
+        bookRepository.delete(bookDtoMapper.bookDtoToBook(book));
+        log.info(String.format("The book with id=%d was successfully deleted", id));
     }
 
     @Override
     public List<BookDto> getBooksByUserId(Long id) {
-        List<Long> listBooksId = userService.getUserBookIds(id);
-        List<BookDto> res= new ArrayList<>();
-        listBooksId.forEach(bookId->{
-            res.add(getBookById(bookId));
-                });
-        return  res;
-//        List<Book> allBooks = (List<Book>) bookRepository.findAll();
-//
-//        return allBooks.stream().map(bookDtoMapper::bookToBookDto).filter(book-> book.getUserId()!=null && book.getUserId().equals(id)).toList();
+        log.info("Get user books by userID: {}", id);
+        List<Book> books = bookRepository.findBooksByUserId(id);
+        log.info("A books list was found: {}", books);
+        return books.stream().map(bookDtoMapper::bookToBookDto).toList() ;
     }
+
+    @Override
+    public List<Long> getBooksIdByUserId(Long id) {
+        log.info("Get user booksID by userID: {}", id);
+        List<Book> books = bookRepository.findBooksByUserId(id);
+        log.info("A books list was found: {}", books);
+        return books.stream().map(Book::getId).toList() ;
+    }
+
+
 }

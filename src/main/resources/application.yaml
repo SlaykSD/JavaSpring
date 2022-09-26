@@ -1,8 +1,23 @@
 swagger-api:
   version: "1.0"
 
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/ServiceYlabDB
+    username: "postgres"
+    password: "postgres"
+    driverClassName: org.postgresql.Driver
+  jpa:
+    database: POSTGRESQL
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  liquibase:
+    enabled: true
+    change-log: classpath:liquibase.db.changelog/db.changelog-master.xml
 server:
-  port: 8091
+  port: 8090
   servlet:
     context-path: /app
 management:
