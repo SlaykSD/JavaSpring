@@ -10,6 +10,7 @@ import com.edu.ulab.app.web.request.BookRequest;
 import com.edu.ulab.app.web.request.UserBookRequest;
 import com.edu.ulab.app.web.request.update.UserBookUpdateRequest;
 import com.edu.ulab.app.web.response.UserBookResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -18,18 +19,14 @@ import java.util.Objects;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class UserDataFacade {
     private final UserServiceImplTemplate userService;
     private final BookServiceImplTemplate bookService;
     private final UserMapper userMapper;
     private final BookMapper bookMapper;
 
-    public UserDataFacade(UserServiceImplTemplate userService, BookServiceImplTemplate bookService, UserMapper userMapper, BookMapper bookMapper) {
-        this.userService = userService;
-        this.bookService = bookService;
-        this.userMapper = userMapper;
-        this.bookMapper = bookMapper;
-    }
+
 
 
     public UserBookResponse createUserWithBooks(UserBookRequest userBookRequest) {

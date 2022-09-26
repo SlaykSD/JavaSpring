@@ -1,7 +1,7 @@
 package com.edu.ulab.app.validators;
 
 import com.edu.ulab.app.web.request.UserBookRequest;
-import com.edu.ulab.app.web.request.UserRequest;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -9,6 +9,7 @@ import org.springframework.validation.Validator;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -24,21 +25,23 @@ public class UserBookRequestValidator implements Validator {
     }
 
     @Override
-    public boolean supports(Class<?> clazz) {
+    public boolean supports(@Nullable Class<?> clazz) {
         return UserBookRequest.class.equals(clazz);
     }
 
     @Override
-    public void validate(Object target, Errors errors) {
+    public void validate(@Nullable Object target, @Nullable Errors errors) {
         javax.validation.Validator validator = validatorFactory.getValidator();
         Set<ConstraintViolation<Object>> violations = validator.validate(target);
         for (ConstraintViolation<Object> violation : violations) {
             String propertyPath = violation.getPropertyPath().toString();
             String message = violation.getMessage();
-            errors.rejectValue(propertyPath, "", message);
+            if (errors != null) {
+                errors.rejectValue(propertyPath, "", message);
+            }
         }
         UserBookRequest userBookRequest = (UserBookRequest) target;
-        userBookRequest.getBookRequests().forEach(bookRequest -> bookValidator.validateByField(bookRequest,errors,"bookRequests"));
+        Objects.requireNonNull(userBookRequest).getBookRequests().forEach(bookRequest -> bookValidator.validateByField(bookRequest,errors,"bookRequests"));
         userValidator.validateByField(userBookRequest.getUserRequest(),errors,"userRequest");
     }
 }

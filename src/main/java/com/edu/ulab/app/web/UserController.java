@@ -5,7 +5,6 @@ import com.edu.ulab.app.validators.BookRequestValidator;
 import com.edu.ulab.app.validators.UserBookRequestValidator;
 import com.edu.ulab.app.validators.update.UserBookUpdateRequestValidator;
 import com.edu.ulab.app.web.constant.WebConstant;
-import com.edu.ulab.app.web.request.BookRequest;
 import com.edu.ulab.app.web.request.BooksRequest;
 import com.edu.ulab.app.web.request.UserBookRequest;
 import com.edu.ulab.app.web.request.update.UserBookUpdateRequest;
@@ -14,17 +13,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.management.openmbean.InvalidKeyException;
 import javax.validation.*;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
-import java.util.List;
 
 import static com.edu.ulab.app.web.constant.WebConstant.REQUEST_ID_PATTERN;
 import static com.edu.ulab.app.web.constant.WebConstant.RQID;
@@ -33,18 +30,14 @@ import static com.edu.ulab.app.web.constant.WebConstant.RQID;
 @RestController
 @RequestMapping(value = WebConstant.VERSION_URL + "/user",
         produces = MediaType.APPLICATION_JSON_VALUE)
+@RequiredArgsConstructor
 public class UserController {
     private final UserDataFacade userDataFacade;
     private final UserBookRequestValidator userBookRequestValidator;
     private final UserBookUpdateRequestValidator userBookUpdateRequestValidator;
     private final BookRequestValidator bookRequestValidator;
 
-    public UserController(UserDataFacade userDataFacade, UserBookRequestValidator userBookRequestValidator, UserBookUpdateRequestValidator userBookUpdateRequestValidator, BookRequestValidator bookRequestValidator) {
-        this.userDataFacade = userDataFacade;
-        this.userBookRequestValidator = userBookRequestValidator;
-        this.userBookUpdateRequestValidator = userBookUpdateRequestValidator;
-        this.bookRequestValidator = bookRequestValidator;
-    }
+
 
     @PostMapping(value = "/create")
     @Operation(summary = "Create user book row.",

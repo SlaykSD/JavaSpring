@@ -7,28 +7,28 @@ import com.edu.ulab.app.exception.UserNotFoundException;
 import com.edu.ulab.app.mapper.dto.UserDtoMapper;
 import com.edu.ulab.app.mapper.row.UserRowMapper;
 import com.edu.ulab.app.service.UserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.sql.PreparedStatement;
 import java.util.Objects;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserServiceImplTemplate implements UserService {
     private final JdbcTemplate jdbcTemplate;
     private final UserDtoMapper userDtoMapper;
 
-    public UserServiceImplTemplate(JdbcTemplate jdbcTemplate, UserDtoMapper userDtoMapper) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.userDtoMapper = userDtoMapper;
-    }
 
 
     @Override
+    @Transactional
     public UserDto createUser(UserDto userDto) {
 
 
@@ -48,6 +48,7 @@ public class UserServiceImplTemplate implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto updateUser(UserDto userDto) {
         getUserById(userDto.getId());
         jdbcTemplate.update(
@@ -81,6 +82,7 @@ public class UserServiceImplTemplate implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteUserById(Long id) {
         UserDto userDto = getUserById(id);
         jdbcTemplate.update(

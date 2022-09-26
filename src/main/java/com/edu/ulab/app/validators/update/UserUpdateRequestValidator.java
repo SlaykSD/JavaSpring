@@ -2,6 +2,7 @@ package com.edu.ulab.app.validators.update;
 
 import com.edu.ulab.app.web.request.UserRequest;
 import com.edu.ulab.app.web.request.update.UserUpdateRequest;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -17,19 +18,21 @@ public class UserUpdateRequestValidator implements Validator {
             Validation.buildDefaultValidatorFactory();
 
     @Override
-    public boolean supports(Class<?> clazz) {
+    public boolean supports(@Nullable Class<?> clazz) {
         return UserUpdateRequest.class.equals(clazz);
     }
 
     @Override
-    public void validate(Object target, Errors errors) {
+    public void validate(@Nullable Object target, @Nullable Errors errors) {
         javax.validation.Validator validator = validatorFactory.getValidator();
 
         Set<ConstraintViolation<Object>> violations = validator.validate(target);
         for (ConstraintViolation<Object> violation : violations) {
             String propertyPath = violation.getPropertyPath().toString();
             String message = violation.getMessage();
-            errors.rejectValue(propertyPath, "", message);
+            if (errors != null) {
+                errors.rejectValue(propertyPath, "", message);
+            }
         }
     }
 

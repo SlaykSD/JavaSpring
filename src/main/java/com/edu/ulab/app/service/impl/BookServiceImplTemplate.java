@@ -7,30 +7,30 @@ import com.edu.ulab.app.exception.BookNotFoundException;
 import com.edu.ulab.app.mapper.dto.BookDtoMapper;
 import com.edu.ulab.app.mapper.row.BookRowMapper;
 import com.edu.ulab.app.service.BookService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Objects;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class BookServiceImplTemplate implements BookService {
 
     private final JdbcTemplate jdbcTemplate;
     private final BookDtoMapper bookDtoMapper;
 
-    public BookServiceImplTemplate(JdbcTemplate jdbcTemplate, BookDtoMapper bookDtoMapper) {
 
-        this.jdbcTemplate = jdbcTemplate;
-        this.bookDtoMapper = bookDtoMapper;
-    }
 
     @Override
+    @Transactional
     public BookDto createBook(BookDto bookDto) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
@@ -51,6 +51,7 @@ public class BookServiceImplTemplate implements BookService {
     }
 
     @Override
+    @Transactional
     public BookDto updateBook(BookDto bookDto) {
         getBookById(bookDto.getId());
         jdbcTemplate.update(
@@ -84,6 +85,7 @@ public class BookServiceImplTemplate implements BookService {
     }
 
     @Override
+    @Transactional
     public void deleteBookById(Long id) {
         BookDto bookDto = getBookById(id);
         jdbcTemplate.update(

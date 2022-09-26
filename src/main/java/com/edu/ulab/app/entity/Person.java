@@ -1,13 +1,9 @@
 package com.edu.ulab.app.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
+import lombok.Data;
 import javax.persistence.*;
-import javax.validation.constraints.Min;
-import java.util.List;
+
 
 @Data
 @Entity

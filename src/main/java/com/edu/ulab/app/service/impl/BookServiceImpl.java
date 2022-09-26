@@ -2,31 +2,25 @@ package com.edu.ulab.app.service.impl;
 
 import com.edu.ulab.app.dto.BookDto;
 import com.edu.ulab.app.entity.Book;
-import com.edu.ulab.app.entity.Person;
 import com.edu.ulab.app.exception.BookNotFoundException;
-import com.edu.ulab.app.exception.UserNotFoundException;
 import com.edu.ulab.app.mapper.dto.BookDtoMapper;
 import com.edu.ulab.app.repository.BookRepository;
 import com.edu.ulab.app.service.BookService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final BookDtoMapper bookDtoMapper;
-    private final UserServiceImpl userService;
 
-    public BookServiceImpl(BookRepository bookRepository, BookDtoMapper bookDtoMapper, UserServiceImpl userService) {
-        this.bookRepository = bookRepository;
-        this.bookDtoMapper = bookDtoMapper;
-        this.userService = userService;
-    }
+
 
     @Override
     @Transactional
