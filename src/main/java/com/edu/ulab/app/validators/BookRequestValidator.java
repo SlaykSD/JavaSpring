@@ -28,7 +28,18 @@ public class BookRequestValidator implements Validator {
         for (ConstraintViolation<Object> violation : violations) {
             String propertyPath = violation.getPropertyPath().toString();
             String message = violation.getMessage();
-            errors.rejectValue(propertyPath, "", message);
+            errors.rejectValue(propertyPath, "some", message);
+        }
+
+    }
+
+    public void validateByField(Object target, Errors errors,String field) {
+        javax.validation.Validator validator = validatorFactory.getValidator();
+
+        Set<ConstraintViolation<Object>> violations = validator.validate(target);
+        for (ConstraintViolation<Object> violation : violations) {
+            String message = violation.getMessage();
+            errors.rejectValue(field, "some", message);
         }
 
     }

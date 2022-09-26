@@ -38,7 +38,7 @@ public class UserBookRequestValidator implements Validator {
             errors.rejectValue(propertyPath, "", message);
         }
         UserBookRequest userBookRequest = (UserBookRequest) target;
-        userBookRequest.getBookRequests().forEach(bookRequest -> bookValidator.validate(bookRequest,errors));
-        userValidator.validate(userBookRequest.getUserRequest(),errors);
+        userBookRequest.getBookRequests().forEach(bookRequest -> bookValidator.validateByField(bookRequest,errors,"bookRequests"));
+        userValidator.validateByField(userBookRequest.getUserRequest(),errors,"userRequest");
     }
 }
