@@ -4,7 +4,9 @@ import com.edu.ulab.app.dto.BookDto;
 import com.edu.ulab.app.dto.UserDto;
 import com.edu.ulab.app.mapper.request.BookMapper;
 import com.edu.ulab.app.mapper.request.UserMapper;
+import com.edu.ulab.app.service.impl.BookServiceImpl;
 import com.edu.ulab.app.service.impl.BookServiceImplTemplate;
+import com.edu.ulab.app.service.impl.UserServiceImpl;
 import com.edu.ulab.app.service.impl.UserServiceImplTemplate;
 import com.edu.ulab.app.web.request.BookRequest;
 import com.edu.ulab.app.web.request.UserBookRequest;
@@ -21,8 +23,8 @@ import java.util.Objects;
 @Component
 @RequiredArgsConstructor
 public class UserDataFacade {
-    private final UserServiceImplTemplate userService;
-    private final BookServiceImplTemplate bookService;
+    private final UserServiceImpl userService;
+    private final BookServiceImpl bookService;
     private final UserMapper userMapper;
     private final BookMapper bookMapper;
 
