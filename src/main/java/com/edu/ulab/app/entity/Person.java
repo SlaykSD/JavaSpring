@@ -29,7 +29,7 @@ public class Person {
     private String title;
 
     @Column(nullable = false)
-    private int age;
+    private Integer age;
 
     @OneToMany(mappedBy = "person", cascade = {
             CascadeType.MERGE,

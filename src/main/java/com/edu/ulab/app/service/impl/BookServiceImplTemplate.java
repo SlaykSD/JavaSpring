@@ -126,7 +126,7 @@ public class BookServiceImplTemplate implements BookService {
                     return ps;
                 }, new BookRowMapper()).stream().toList();
         log.info("A books list was found: {}", books);
-        return books.stream().map(book -> book.getId().longValue()).toList();
+        return books.stream().map(Book::getId).toList();
     }
 
 

@@ -25,7 +25,7 @@ public class Book {
     private String author;
 
     @Column(nullable = false)
-    private long pageCount;
+    private Integer pageCount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "person_id", nullable = false)

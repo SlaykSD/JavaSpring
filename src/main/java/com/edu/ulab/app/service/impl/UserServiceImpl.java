@@ -56,8 +56,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUserById(Long id) {
         log.info("Got user id for delete: {}", id);
-        Person person = userDtoMapper.userDtoToPerson(getUserById(id));
-        userRepository.delete(person);
+        getUserById(id);
+        userRepository.deleteById(id);
         log.info(String.format("The user with id%d was successfully deleted", id));
     }
 

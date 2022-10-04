@@ -30,6 +30,9 @@ public class BookServiceImpl implements BookService {
     @Transactional
     public BookDto createBook(BookDto bookDto) {
         Book book = bookDtoMapper.bookDtoToBook(bookDto);
+        Person person = new Person();
+        person.setId(bookDto.getUserId());
+        book.setPerson(person);
         log.info("Mapped book: {}", book);
         Book savedBook = bookRepository.save(book);
         log.info("Saved book: {}", savedBook);
@@ -42,6 +45,9 @@ public class BookServiceImpl implements BookService {
         bookRepository.findByIdForUpdate(bookDto.getId())
                 .orElseThrow(() -> new BookNotFoundException(bookDto.getId()));
         Book book = bookDtoMapper.bookDtoToBook(bookDto);
+        Person person = new Person();
+        person.setId(bookDto.getUserId());
+        book.setPerson(person);
         log.info("Mapped book: {}", book);
         Book savedBook = bookRepository.save(book);
         log.info("Update book: {}", savedBook);
@@ -70,7 +76,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public List<BookDto> getBooksByUserId(Long id) {
         log.info("Get user books by userID: {}", id);
-        List<Book> books = bookRepository.findBooksByUserId(id.intValue());
+        List<Book> books = bookRepository.findBooksByUserId(id);
         log.info("A books list was found: {}", books);
         return books.stream().map(bookDtoMapper::bookToBookDto).toList() ;
     }
