@@ -3,6 +3,7 @@ package com.edu.ulab.app.service;
 import com.edu.ulab.app.dto.UserDto;
 import com.edu.ulab.app.entity.Person;
 import com.edu.ulab.app.exception.NotFoundException;
+import com.edu.ulab.app.exception.UserNotFoundException;
 import com.edu.ulab.app.mapper.dto.UserDtoMapper;
 import com.edu.ulab.app.repository.UserRepository;
 import com.edu.ulab.app.service.impl.UserServiceImpl;
@@ -36,9 +37,10 @@ public class UserServiceImplTest {
 
     @Mock
     UserDtoMapper userMapper;
+
     @Test
     @DisplayName("Создание пользователя. Должно пройти успешно.")
-    void savePerson_Test() {
+    void savePersonTest() {
         //given
 
         UserDto userDto = new UserDto();
@@ -80,8 +82,13 @@ public class UserServiceImplTest {
     // update
     @Test
     @DisplayName("Изменить пользователя. Должно пройти успешно.")
-    void updatePerson_Test() {
+    void updatePersonTest() {
         //given
+        Person person  = new Person();
+        person.setId(1L);
+        person.setFullName("test name");
+        person.setAge(11);
+        person.setTitle("test title");
 
         UserDto userUpdateDto = new UserDto();
         userUpdateDto.setId(1L);
@@ -103,8 +110,8 @@ public class UserServiceImplTest {
 
         //when
 
+        when(userRepository.findByIdForUpdate(updatePerson.getId())).thenReturn(Optional.of(person));
         when(userMapper.userDtoToPerson(userUpdateDto)).thenReturn(updatePerson);
-        when(userRepository.findById(updatePerson.getId())).thenReturn(Optional.of(updatePerson));
         when(userRepository.save(updatePerson)).thenReturn(updatePerson);
         when(userMapper.personToUserDto(updatePerson)).thenReturn(resultUpdate);
 
@@ -112,13 +119,14 @@ public class UserServiceImplTest {
         //then
         UserDto userDtoResult = userService.updateUser(userUpdateDto);
         assertEquals(1L, userDtoResult.getId());
+        assertEquals(54, userDtoResult.getAge());
         assertEquals("Ed Sheeran", userDtoResult.getFullName());
         assertEquals("I see fire int the mountain", userDtoResult.getTitle());
     }
     // get
     @Test
     @DisplayName("Выдать пользователя. Должно пройти успешно.")
-    void getPerson_Test() {
+    void getPersonTest() {
         //given
         Long userId = 1L;
 
@@ -151,12 +159,26 @@ public class UserServiceImplTest {
     // delete
     @Test
     @DisplayName("Удалить пользователя. Должно пройти успешно.")
-    void deletePerson_Test() {
+    void deletePersonTest() {
         //given
 
         Long personId = 1L;
 
+        Person person  = new Person();
+        person.setId(personId);
+        person.setFullName("test name");
+        person.setAge(11);
+        person.setTitle("test title");
+
+        UserDto userDto = new UserDto();
+        userDto.setAge(11);
+        userDto.setFullName("test name");
+        userDto.setTitle("test title");
+
+
         //when
+        when(userRepository.findById(personId)).thenReturn(Optional.of(person));
+        when(userMapper.personToUserDto(person)).thenReturn(userDto);
         doNothing().when(userRepository).deleteById(personId);
 
         //then
@@ -167,39 +189,22 @@ public class UserServiceImplTest {
 
     @Test
     @DisplayName("Ошибка при выдаче пользователя. Должно пройти успешно.")
-    void failedGetPerson_Test() {
+    void failedGetPersonTest() {
         //given
         Long userId = 1L;
 
-        Person savedPerson  = new Person();
-        savedPerson.setId(1L);
-        savedPerson.setFullName("test name");
-        savedPerson.setAge(11);
-        savedPerson.setTitle("test title");
-
-        UserDto result = new UserDto();
-        result.setId(1L);
-        result.setAge(11);
-        result.setFullName("test name");
-        result.setTitle("test title");
-
-
         //when
-
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
-        when(userMapper.personToUserDto(savedPerson)).thenReturn(result);
-
 
         //then
 
         assertThatThrownBy(() -> userService.getUserById(userId))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessage("User with id: 1 not found");
+                .isInstanceOf(UserNotFoundException.class)
+                .hasMessage(String.format("User with id = %s not found.", userId));
     }
 
     @Test
     @DisplayName("Ошибка при изменении пользователя. Должно пройти успешно.")
-    void failedUpdatePerson_Test() {
+    void failedUpdatePersonTest() {
         //given
 
         UserDto userUpdateDto = new UserDto();
@@ -208,36 +213,12 @@ public class UserServiceImplTest {
         userUpdateDto.setFullName("Ed Sheeran");
         userUpdateDto.setTitle("I see fire");
 
-        Person savedPerson  = new Person();
-        savedPerson.setId(1L);
-        savedPerson.setFullName("test name");
-        savedPerson.setAge(11);
-        savedPerson.setTitle("test title");
-
-        Person updatePerson  = new Person();
-        updatePerson.setId(1L);
-        updatePerson.setFullName("Ed Sheeran");
-        updatePerson.setAge(18);
-        updatePerson.setTitle("I see fire");
-
-        UserDto resultUpdate = new UserDto();
-        resultUpdate.setId(1L);
-        resultUpdate.setFullName("Ed Sheeran");
-        resultUpdate.setAge(18);
-        resultUpdate.setTitle("I see fire");
-
         //when
-
-        when(userMapper.userDtoToPerson(userUpdateDto)).thenReturn(updatePerson);
-        when(userRepository.findById(updatePerson.getId())).thenReturn(Optional.empty());
-        when(userRepository.save(updatePerson)).thenReturn(updatePerson);
-        when(userMapper.personToUserDto(updatePerson)).thenReturn(resultUpdate);
-
 
         //then
         assertThatThrownBy(() -> userService.updateUser(userUpdateDto))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessage("User with id: 1 not found");
+                .isInstanceOf(UserNotFoundException.class)
+                .hasMessage(String.format("User with id = %s not found.", userUpdateDto.getId()));
     }
 
     // update

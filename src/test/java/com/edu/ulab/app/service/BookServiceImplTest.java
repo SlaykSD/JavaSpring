@@ -4,6 +4,7 @@ import com.edu.ulab.app.dto.BookDto;
 import com.edu.ulab.app.entity.Book;
 import com.edu.ulab.app.entity.Person;
 
+import com.edu.ulab.app.exception.BookNotFoundException;
 import com.edu.ulab.app.exception.NotFoundException;
 import com.edu.ulab.app.mapper.dto.BookDtoMapper;
 import com.edu.ulab.app.repository.BookRepository;
@@ -43,7 +44,7 @@ public class BookServiceImplTest {
 
     @Test
     @DisplayName("Создание книги. Должно пройти успешно.")
-    void saveBook_Test() {
+    void saveBookTest() {
         //given
         Person person  = new Person();
         person.setId(1001L);
@@ -84,48 +85,39 @@ public class BookServiceImplTest {
         //then
         BookDto bookDtoResult = bookService.createBook(bookDto);
         assertEquals(1L, bookDtoResult.getId());
+        assertEquals(1001L, bookDtoResult.getUserId());
+        assertEquals(500, bookDtoResult.getPageCount());
+        assertEquals("test author", bookDtoResult.getAuthor() );
+        assertEquals("test title", bookDtoResult.getTitle() );
     }
 
 
     // update
     @Test
     @DisplayName("Изменение книги. Должно пройти успешно.")
-    void updateBook_Test() {
+    void updateBookTest() {
         //given
         Person person  = new Person();
-        person.setId(1L);
-
-        BookDto bookDto = new BookDto();
-        bookDto.setUserId(1L);
-        bookDto.setAuthor("test author");
-        bookDto.setTitle("test title");
-        bookDto.setPageCount(250);
+        person.setId(1001L);
 
         BookDto bookDtoUpdate = new BookDto();
         bookDtoUpdate.setId(1L);
-        bookDtoUpdate.setUserId(1L);
+        bookDtoUpdate.setUserId(1001L);
         bookDtoUpdate.setAuthor("Ed Sheeran");
         bookDtoUpdate.setTitle("I see fire");
         bookDtoUpdate.setPageCount(10);
 
-        BookDto result = new BookDto();
-        result.setId(1L);
-        result.setUserId(1L);
-        result.setAuthor("test author");
-        result.setTitle("test title");
-        result.setPageCount(250);
-
         Book book = new Book();
-        book.setPageCount(250);
-        book.setTitle("test title");
+        book.setPageCount(500);
         book.setAuthor("test author");
+        book.setTitle("test title");
         book.setPerson(person);
 
         Book savedBook = new Book();
         savedBook.setId(1L);
-        savedBook.setPageCount(250);
-        savedBook.setTitle("test title");
-        savedBook.setAuthor("test author");
+        bookDtoUpdate.setPageCount(10);
+        savedBook.setTitle("I see fire");
+        savedBook.setAuthor("Ed Sheeran");
         savedBook.setPerson(person);
 
         Book updateBook = new Book();
@@ -137,30 +129,33 @@ public class BookServiceImplTest {
 
         //when
 
+        when(bookRepository.findByIdForUpdate(bookDtoUpdate.getId())).thenReturn(Optional.of(book));
         when(bookMapper.bookDtoToBook(bookDtoUpdate)).thenReturn(updateBook);
-        when(bookRepository.save(updateBook)).thenReturn(updateBook);
-        when(bookMapper.bookToBookDto(updateBook)).thenReturn(bookDtoUpdate);
+        when(bookRepository.save(updateBook)).thenReturn(savedBook);
+        when(bookMapper.bookToBookDto(savedBook)).thenReturn(bookDtoUpdate);
 
 
         //then
         BookDto bookDtoResult = bookService.updateBook(bookDtoUpdate);
         assertEquals(1L, bookDtoResult.getId());
+        assertEquals(1001L, bookDtoResult.getUserId());
+        assertEquals(10,bookDtoResult.getPageCount());
         assertEquals("Ed Sheeran", bookDtoResult.getAuthor());
         assertEquals("I see fire", bookDtoResult.getTitle());
     }
     // get
     @Test
     @DisplayName("Выдать книги. Должно пройти успешно.")
-    void getBook_Test() {
+    void getBookTest() {
         //given
         Person person  = new Person();
-        person.setId(1L);
+        person.setId(1001L);
 
         Long bookId = 1L;
 
         BookDto result = new BookDto();
         result.setId(1L);
-        result.setUserId(1L);
+        result.setUserId(1001L);
         result.setAuthor("test author");
         result.setTitle("test title");
         result.setPageCount(1000);
@@ -180,14 +175,17 @@ public class BookServiceImplTest {
 
         //then
         BookDto bookDtoResult = bookService.getBookById(bookId);
+        assertEquals(1L, bookDtoResult.getId());
         assertEquals("test title", bookDtoResult.getTitle());
         assertEquals("test author", bookDtoResult.getAuthor());
+        assertEquals(1001L, bookDtoResult.getUserId());
+        assertEquals(1000, bookDtoResult.getPageCount());
     }
     // get all
 
     @Test
     @DisplayName("Выдать все книги по id юзера. Должно пройти успешно.")
-    void getAllBook_Test() {
+    void getAllBookTest() {
         //given
         Person person  = new Person();
         person.setId(1L);
@@ -239,13 +237,31 @@ public class BookServiceImplTest {
     // delete
     @Test
     @DisplayName("Удалить книгу. Должно пройти успешно.")
-    void deleteBook_Test() {
+    void deleteBookTest() {
         //given
-
         Long bookId = 1L;
 
-        //when
+        Person person  = new Person();
+        person.setId(bookId);
 
+        Book book = new Book();
+        book.setId(bookId);
+        book.setPageCount(500);
+        book.setAuthor("test author");
+        book.setTitle("test title");
+        book.setPerson(person);
+
+        BookDto result = new BookDto();
+        result.setId(bookId);
+        result.setUserId(1L);
+        result.setAuthor("test author");
+        result.setTitle("test title");
+        result.setPageCount(1000);
+
+
+        //when
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+        when(bookService.getBookById(bookId)).thenReturn(result);
         doNothing().when(bookRepository).deleteById(bookId);
 
         //then
@@ -255,7 +271,7 @@ public class BookServiceImplTest {
 
     @Test
     @DisplayName("Ошибка при выдачи книги. Должно пройти успешно.")
-    void failedGetBook_Test() {
+    void failedGetBookTest() {
         //given
         Person person  = new Person();
         person.setId(1L);
@@ -278,13 +294,11 @@ public class BookServiceImplTest {
 
         //when
 
-        when(bookRepository.findById(bookId)).thenReturn(null);
-
 
         //then
         assertThatThrownBy(() -> bookService.getBookById(bookId))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessage("Book with id: 1 not found");
+                .isInstanceOf(BookNotFoundException.class)
+                .hasMessage(String.format("Book with id = %s not found.",bookId));
     }
 
     // update

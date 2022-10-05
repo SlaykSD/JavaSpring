@@ -3,11 +3,13 @@ package com.edu.ulab.app.repository;
 import com.edu.ulab.app.config.SystemJpaTest;
 import com.edu.ulab.app.entity.Book;
 import com.edu.ulab.app.entity.Person;
+import com.edu.ulab.app.exception.NotFoundException;
 import com.vladmihalcea.sql.SQLStatementCountValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -15,6 +17,8 @@ import java.util.List;
 
 import static com.vladmihalcea.sql.SQLStatementCountValidator.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.Mockito.when;
 
 /**
  * Тесты репозитория {@link BookRepository}.
@@ -32,14 +36,14 @@ public class BookRepositoryTest {
     }
 
   //create
-    @DisplayName("Сохранить книгу и автора. Число select должно равняться 2")
+    @DisplayName("Сохранить книгу с пользователем. Число select должно равняться 2")
     @Test
     @Rollback
     @Sql({"classpath:sql/1_clear_schema.sql",
             "classpath:sql/2_insert_person_data.sql",
             "classpath:sql/3_insert_book_data.sql"
     })
-    void findAllBadges_thenAssertDmlCount() {
+    void saveBookCheckAssertDmlCount() {
         //Given
 
         Person person = new Person();
@@ -75,18 +79,19 @@ public class BookRepositoryTest {
             "classpath:sql/2_insert_person_data.sql",
             "classpath:sql/3_insert_book_data.sql"
     })
-    void updateAllBadges_thenAssertDmlCount() {
+    void updateBookCheckAssertDmlCount() {
         //Given
         Book updateBook = new Book();
         updateBook.setId(2002L);
-        updateBook.setAuthor("soymun");
-        updateBook.setTitle("one day");
-        updateBook.setPageCount(233);
+        updateBook.setAuthor("Ed van der Meer");
+        updateBook.setTitle("The best guitar lesson");
+        updateBook.setPageCount(13);
         //When
         Book result = bookRepository.save(updateBook);
         //Then
-        assertThat(result.getPageCount()).isEqualTo(233);
-        assertThat(result.getTitle()).isEqualTo("one day");
+        assertThat(result.getPageCount()).isEqualTo(13);
+        assertThat(result.getTitle()).isEqualTo("The best guitar lesson");
+        assertThat(result.getAuthor()).isEqualTo("Ed van der Meer");
         assertSelectCount(1);
         assertInsertCount(0);
         assertUpdateCount(0);
@@ -100,7 +105,7 @@ public class BookRepositoryTest {
             "classpath:sql/2_insert_person_data.sql",
             "classpath:sql/3_insert_book_data.sql"
     })
-    void getBadges_thenAssertDmlCount() {
+    void getBookCheckAssertDmlCount() {
         //Given
         Long bookId = 2002L;
         //When
@@ -113,19 +118,20 @@ public class BookRepositoryTest {
         assertUpdateCount(0);
         assertDeleteCount(0);
     }
+
     // get all
-    @DisplayName("Выдать все книги по юзеру. Число select должно равняться 1")
+    @DisplayName("Выдать все книги пользователя. Число select должно равняться 1")
     @Test
     @Rollback
     @Sql({"classpath:sql/1_clear_schema.sql",
             "classpath:sql/2_insert_person_data.sql",
             "classpath:sql/3_insert_book_data.sql"
     })
-    void getAllBadgesByUserId_thenAssertDmlCount() {
+    void getAllBooksCheckAssertDmlCount() {
         //Given
         Long personId = 1001L;
         //When
-        List<Book> result = bookRepository.findBooksByUserId(personId.intValue());
+        List<Book> result = bookRepository.findBooksByUserId(personId);
         //Then
         assertThat(result.size()).isEqualTo(2);
         assertThat(result.get(1).getId()).isEqualTo(3003);
@@ -143,7 +149,7 @@ public class BookRepositoryTest {
             "classpath:sql/2_insert_person_data.sql",
             "classpath:sql/3_insert_book_data.sql"
     })
-    void deleteBadges_thenAssertDmlCount() {
+    void deleteBookCheckAssertDmlCount() {
         //Given
         Long bookId = 2002L;
         //When
@@ -157,7 +163,31 @@ public class BookRepositoryTest {
         assertUpdateCount(0);
         assertDeleteCount(0);
     }
-    // * failed
+
+
+
+    //failed delete
+    @DisplayName("Удалить несуществующую книгу. Число select должно равняться 1")
+    @Test
+    @Rollback
+    @Sql({"classpath:sql/1_clear_schema.sql",
+            "classpath:sql/2_insert_person_data.sql",
+            "classpath:sql/3_insert_book_data.sql"
+    })
+    void failedDeleteBookAssertDmlCount() {
+        //Given
+        Long bookId = 2000L;
+        //When
+        bookRepository.deleteById(bookId);
+        Book book = bookRepository.findById(bookId).orElse(null);
+        //Then
+        assertThatThrownBy(book::getAuthor)
+                .isInstanceOf(NullPointerException.class);
+        assertSelectCount(1);
+        assertInsertCount(0);
+        assertUpdateCount(0);
+        assertDeleteCount(0);
+    }
 
     // example failed test
 }

@@ -1,7 +1,7 @@
 create table ulab_edu.book
 (
-    book_id    integer     not null,
-    person_id  integer     not null,
+    book_id    bigint     not null,
+    person_id  bigint     not null,
     title      varchar(50) not null,
     author     varchar(50) not null,
     page_count integer     not null,

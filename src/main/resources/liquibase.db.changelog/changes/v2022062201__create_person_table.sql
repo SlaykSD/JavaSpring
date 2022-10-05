@@ -2,7 +2,7 @@ CREATE SCHEMA ulab_edu;
 
 create table ulab_edu.person
 (
-    person_id integer     not null,
+    person_id bigint     not null,
     full_name varchar(50) not null,
     title     varchar(50) not null,
     age       integer     not null,

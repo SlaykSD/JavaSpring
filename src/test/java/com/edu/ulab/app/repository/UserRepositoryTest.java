@@ -1,6 +1,7 @@
 package com.edu.ulab.app.repository;
 
 import com.edu.ulab.app.config.SystemJpaTest;
+import com.edu.ulab.app.entity.Book;
 import com.edu.ulab.app.entity.Person;
 import com.vladmihalcea.sql.SQLStatementCountValidator;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,19 +28,20 @@ public class UserRepositoryTest {
         SQLStatementCountValidator.reset();
     }
 
-    @DisplayName("Сохранить юзера. Число select должно равняться 1")
+    //create
+    @DisplayName("Сохранить пользователя без книги. Число select должно равняться 1")
     @Test
     @Rollback
     @Sql({"classpath:sql/1_clear_schema.sql",
             "classpath:sql/2_insert_person_data.sql",
             "classpath:sql/3_insert_book_data.sql"
     })
-    void insertPerson_thenAssertDmlCount() {
+    void savePersonCheckAssertDmlCount() {
         //Given
         Person person = new Person();
         person.setAge(111);
-        person.setTitle("reader");
-        person.setFullName("Test Test");
+        person.setTitle("Anonimus");
+        person.setFullName("Charly chaplin");
 
         //When
         Person result = userRepository.save(person);
@@ -52,28 +54,62 @@ public class UserRepositoryTest {
         assertDeleteCount(0);
     }
 
-    // update
-    @DisplayName("Изменить юзера. Число select должно равняться 1")
+
+    //create 2
+    @DisplayName("Сохранить пользователя без книги. Число select должно равняться 1")
     @Test
     @Rollback
     @Sql({"classpath:sql/1_clear_schema.sql",
             "classpath:sql/2_insert_person_data.sql",
             "classpath:sql/3_insert_book_data.sql"
     })
-    void updatePerson_thenAssertDmlCount() {
+    void savePersonsCheckAssertDmlCount() {
+        //Given
+        Person person = new Person();
+        person.setAge(111);
+        person.setTitle("Anonimus");
+        person.setFullName("Charly chaplin");
+
+        Person person2 = new Person();
+        person2.setAge(21);
+        person2.setTitle("reader");
+        person2.setFullName("Alex Pirs");
+
+        //When
+        Person result = userRepository.save(person);
+        Person result2 = userRepository.save(person2);
+
+        //Then
+        assertThat(result.getAge()).isEqualTo(111);
+        assertThat(result2.getAge()).isEqualTo(21);
+        assertSelectCount(2);
+        assertInsertCount(0);
+        assertUpdateCount(0);
+        assertDeleteCount(0);
+    }
+
+    // update
+    @DisplayName("Изменить пользователя. Число select должно равняться 1")
+    @Test
+    @Rollback
+    @Sql({"classpath:sql/1_clear_schema.sql",
+            "classpath:sql/2_insert_person_data.sql",
+            "classpath:sql/3_insert_book_data.sql"
+    })
+    void updatePersonCheckAssertDmlCount() {
         //Given
         Person person = new Person();
         person.setId(1001L);
-        person.setAge(18);
+        person.setAge(31);
         person.setTitle("reader");
-        person.setFullName("soymun");
+        person.setFullName("Ed van der Meer");
 
         //When
         Person result = userRepository.save(person);
 
         //Then
-        assertThat(result.getAge()).isEqualTo(18);
-        assertThat(result.getFullName()).isEqualTo("soymun");
+        assertThat(result.getAge()).isEqualTo(31);
+        assertThat(result.getFullName()).isEqualTo("Ed van der Meer");
         assertThat(result.getId()).isEqualTo(1001L);
         assertSelectCount(1);
         assertInsertCount(0);
@@ -81,14 +117,14 @@ public class UserRepositoryTest {
         assertDeleteCount(0);
     }
     // get
-    @DisplayName("Выдать юзера. Число select должно равняться 1")
+    @DisplayName("Выдать пользователя. Число select должно равняться 1")
     @Test
     @Rollback
     @Sql({"classpath:sql/1_clear_schema.sql",
             "classpath:sql/2_insert_person_data.sql",
             "classpath:sql/3_insert_book_data.sql"
     })
-    void getPerson_thenAssertDmlCount() {
+    void getPersonCheckAssertDmlCount() {
         //Given
         Long personId = 1001L;
         //When
@@ -111,14 +147,14 @@ public class UserRepositoryTest {
             "classpath:sql/2_insert_person_data.sql",
             "classpath:sql/3_insert_book_data.sql"
     })
-    void deletePerson_thenAssertDmlCount() {
+    void deletePersonCheckAssertDmlCount() {
         //Given
         Long personId = 1001L;
         //When
         userRepository.deleteById(personId);
         Person result = userRepository.findById(personId).orElse(new Person());
         //Then
-        assertThat(result.getAge()).isEqualTo(0);
+        assertThat(result.getAge()).isEqualTo(null);
         assertThat(result.getFullName()).isEqualTo(null);
         assertSelectCount(1);
         assertInsertCount(0);
@@ -133,14 +169,14 @@ public class UserRepositoryTest {
             "classpath:sql/2_insert_person_data.sql",
             "classpath:sql/3_insert_book_data.sql"
     })
-    void failedGetPerson_thenAssertDmlCount() {
+    void failedGetPersonCheckAssertDmlCount() {
         //Given
         Long personId = 1000L;
         //When
         Person result = userRepository.findById(personId).orElse(null);
 
         //Then
-        assertThatThrownBy(() -> result.getAge())
+        assertThatThrownBy(result::getAge)
                 .isInstanceOf(NullPointerException.class);
         assertSelectCount(1);
         assertInsertCount(0);
