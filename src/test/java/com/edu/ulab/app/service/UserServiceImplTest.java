@@ -77,6 +77,9 @@ public class UserServiceImplTest {
 
         UserDto userDtoResult = userService.createUser(userDto);
         assertEquals(1L, userDtoResult.getId());
+        assertEquals(11, userDtoResult.getAge());
+        assertEquals("test name", userDtoResult.getFullName());
+        assertEquals("test title", userDtoResult.getTitle());
     }
 
     // update
@@ -155,6 +158,7 @@ public class UserServiceImplTest {
         assertEquals(1L, userDtoResult.getId());
         assertEquals(11, userDtoResult.getAge());
         assertEquals("test name", userDtoResult.getFullName());
+        assertEquals("test title", userDtoResult.getTitle());
     }
     // delete
     @Test
