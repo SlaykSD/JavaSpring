@@ -92,21 +92,21 @@ public class UserServiceImplTest {
 
         UserDto userUpdateDto = new UserDto();
         userUpdateDto.setId(1L);
-        userUpdateDto.setAge(31);
+        userUpdateDto.setAge(54);
         userUpdateDto.setFullName("Ed Sheeran");
-        userUpdateDto.setTitle("I see fire");
+        userUpdateDto.setTitle("designer");
 
         Person updatePerson  = new Person();
         updatePerson.setId(1L);
         updatePerson.setFullName("Ed Sheeran");
         updatePerson.setAge(54);
-        updatePerson.setTitle("I see fire int the mountain");
+        updatePerson.setTitle("designer");
 
         UserDto resultUpdate = new UserDto();
         resultUpdate.setId(1L);
         resultUpdate.setFullName("Ed Sheeran");
         resultUpdate.setAge(54);
-        resultUpdate.setTitle("I see fire int the mountain");
+        resultUpdate.setTitle("designer");
 
         //when
 
@@ -121,7 +121,7 @@ public class UserServiceImplTest {
         assertEquals(1L, userDtoResult.getId());
         assertEquals(54, userDtoResult.getAge());
         assertEquals("Ed Sheeran", userDtoResult.getFullName());
-        assertEquals("I see fire int the mountain", userDtoResult.getTitle());
+        assertEquals("designer", userDtoResult.getTitle());
     }
     // get
     @Test
@@ -211,7 +211,7 @@ public class UserServiceImplTest {
         userUpdateDto.setId(1L);
         userUpdateDto.setAge(18);
         userUpdateDto.setFullName("Ed Sheeran");
-        userUpdateDto.setTitle("I see fire");
+        userUpdateDto.setTitle("designer");
 
         //when
 
