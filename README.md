@@ -15,7 +15,7 @@ For convenient use, there is swagger at the link: http://localhost:8081/library/
 4. Liquibase
 5. PostgreSQL
 6. Docker Containers for integration testing of interaction with the database 
-7. Mocito
+7. Mockito
 8. Swagger
 
 ---
