@@ -4,7 +4,7 @@ In this project, I did a tutorial on creating a backend Spring-boot service to w
 
 ----
 
-For convenient use, there is swagger at the link: http://localhost:8081/library/swagger-ui/index.html
+For convenient use, there is swagger at the link: http://localhost:8091/app/api/v1/person/create
 
 ---
 
