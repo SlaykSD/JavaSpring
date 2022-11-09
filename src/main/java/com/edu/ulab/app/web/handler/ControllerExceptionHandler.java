@@ -23,13 +23,13 @@ public class ControllerExceptionHandler {
     public ResponseEntity<BaseWebResponse> handleNotFoundExceptionException(@NonNull final NotFoundException exc) {
         log.error(exc.getMessage());
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new BaseWebResponse(createErrorMessage(exc)));
     }
 
     @ExceptionHandler({ValidationException.class, HttpMessageNotReadableException.class,NotReadablePropertyException.class})
     public ResponseEntity<BaseWebResponse> handleValidationExceptions(Exception e) {
-        log.error(e.getMessage());
+        log.error("Throws exception: ", e);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new BaseWebResponse(createErrorMessage(e)));
     }

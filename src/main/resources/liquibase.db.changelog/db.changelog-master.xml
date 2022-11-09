@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <include file="liquibase.db.changelog/changes/v2022062201__create_person_table.sql"/>
+    <include file="liquibase.db.changelog/changes/v2022062301__create_book_table.sql"/>
+    <include file="liquibase.db.changelog/changes/v2022071201_create_sequence.sql"/>
+
+</databaseChangeLog>

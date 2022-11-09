@@ -17,6 +17,6 @@ public class BookUpdateRequest {
     @Size( max =20,message = "limit 20 characters")
     private String author;
 
-    @Min(value = 0,message = "A book cannot consist of no pages")
+    @Min(value = 0,message = "The number of pages must be a natural number")
     private long pageCount;
 }

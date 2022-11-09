@@ -4,14 +4,15 @@ import com.edu.ulab.app.dto.BookDto;
 import com.edu.ulab.app.dto.UserDto;
 import com.edu.ulab.app.mapper.request.BookMapper;
 import com.edu.ulab.app.mapper.request.UserMapper;
-import com.edu.ulab.app.mapper.request.update.BookUpdateMapper;
-import com.edu.ulab.app.mapper.request.update.UserUpdateMapper;
-import com.edu.ulab.app.service.BookService;
-import com.edu.ulab.app.service.UserService;
+import com.edu.ulab.app.service.impl.BookServiceImpl;
+import com.edu.ulab.app.service.impl.BookServiceImplTemplate;
+import com.edu.ulab.app.service.impl.UserServiceImpl;
+import com.edu.ulab.app.service.impl.UserServiceImplTemplate;
 import com.edu.ulab.app.web.request.BookRequest;
 import com.edu.ulab.app.web.request.UserBookRequest;
 import com.edu.ulab.app.web.request.update.UserBookUpdateRequest;
 import com.edu.ulab.app.web.response.UserBookResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -20,27 +21,14 @@ import java.util.Objects;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class UserDataFacade {
-    private final UserService userService;
-    private final BookService bookService;
+    private final UserServiceImpl userService;
+    private final BookServiceImpl bookService;
     private final UserMapper userMapper;
     private final BookMapper bookMapper;
-    private final BookUpdateMapper bookUpdateMapper;
-    private final UserUpdateMapper userUpdateMapper;
 
-    public UserDataFacade(UserService userService,
-                          BookService bookService,
-                          UserMapper userMapper,
-                          BookMapper bookMapper,
-                          BookUpdateMapper bookUpdateMapper,
-                          UserUpdateMapper userUpdateMapper) {
-        this.userService = userService;
-        this.bookService = bookService;
-        this.userMapper = userMapper;
-        this.bookMapper = bookMapper;
-        this.bookUpdateMapper = bookUpdateMapper;
-        this.userUpdateMapper = userUpdateMapper;
-    }
+
 
 
     public UserBookResponse createUserWithBooks(UserBookRequest userBookRequest) {
@@ -71,13 +59,13 @@ public class UserDataFacade {
 
     public UserBookResponse updateUserWithBooks(UserBookUpdateRequest userBookRequest) {
         log.info("Got user and book update request: {}", userBookRequest);
-        UserDto userDto =  userService.updateUser(userUpdateMapper
+        UserDto userDto =  userService.updateUser(userMapper
                 .userUpdateRequestToUserDto(userBookRequest.getUserRequest()));
         log.info("Mapped user request: {}", userDto);
         List<Long> listBooksId = userBookRequest.getBookRequests()
                 .stream()
                 .filter(Objects::nonNull)
-                .map(bookUpdateMapper::bookUpdateRequestToBookDto)
+                .map(bookMapper::bookUpdateRequestToBookDto)
                 .peek(bookDto -> bookDto.setUserId(userDto.getId()))
                 .map(bookService::updateBook)
                 .peek(bookDtoUpdated -> log.info(bookDtoUpdated.toString()))
@@ -94,7 +82,7 @@ public class UserDataFacade {
         bookService.getBooksByUserId(userId).stream()
                 .peek(bookFound -> log.info("Found the user's book: {}", bookFound))
                 .forEach(book-> bookService.deleteBookById(book.getId()));
-        log.info("Delete old books user");
+        log.info("Old books have been deleted");
         List<Long> bookIdList = userBookRequest
                 .stream()
                 .filter(Objects::nonNull)
@@ -117,14 +105,7 @@ public class UserDataFacade {
 
         log.info("Got user book get request: {}", userId);
         UserDto userDto = userService.getUserById(userId);
-
-//        List<Long> bookIdList = bookService.getBooksByUserId(userId)
-//                .stream()
-//                .filter(Objects::nonNull)
-//                .peek(bookDto -> log.info("Got book: {}",bookDto))
-//                .map(BookDto::getId)
-//                .toList();
-        List<Long> bookIdList = userService.getUserBookIds(userId);
+        List<Long> bookIdList = bookService.getBooksIdByUserId(userId);
         log.info("Collected book ids: {}", bookIdList);
 
         return UserBookResponse.builder()
@@ -134,12 +115,10 @@ public class UserDataFacade {
     }
 
     public void deleteUserWithBooks(Long userId) {
-        log.info("Got user book delete request: {}", userId);
+        log.info("Got user book delete request with user id: {}", userId);
+        bookService.getBooksIdByUserId(userId).forEach(bookService::deleteBookById);
+        log.info("Books have been deleted with user id: {}", userId);
         userService.deleteUserById(userId);
-        log.info("Delete user with id: {}", userId);
-        bookService.getBooksByUserId(userId).stream()
-                .peek(bookFound -> log.info("Found the user's book: {}", bookFound))
-                .forEach(book-> bookService.deleteBookById(book.getId()));
         log.info("Delete is done");
     }
 }

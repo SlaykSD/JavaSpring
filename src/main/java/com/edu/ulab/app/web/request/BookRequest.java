@@ -15,6 +15,6 @@ public class BookRequest {
     @Size( max =20,message = "limit 20 characters")
     private String author;
 
-    @Min(value = 1,message = "A book cannot consist of no pages")
+    @Min(value = 1,message = "The number of pages must be a natural number")
     private long pageCount;
 }

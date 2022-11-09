@@ -13,6 +13,6 @@ public class UserRequest {
     @Size( max =20,message = "limit 20 characters")
     private String title;
 
-    @Min(value = 0,message = "real age must be more than 0")
+    @Min(value = 0,message = "real age must be greater than or equal to 0")
     private int age;
 }
